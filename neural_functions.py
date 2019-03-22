@@ -1,7 +1,7 @@
 import numpy as np
 
 def synapse(inputs, weights, threshold):
-    x = np.dot(np.array(inputs), np.array(weights)) - np.matrix(threshold)
+    x = np.dot(np.array(inputs), np.array(weights)) - np.array(threshold)
     return np.array(1 / (1 + np.exp(-x)))
 
 def gradient_output(desired, actual):

@@ -22,6 +22,8 @@ class NeuralNet:
         self.output = []
         self.error = 1
 
+        self.sum_squares = []
+
         if not hidden:
             self.weights.append(np.random.rand(inputs, outputs))
 
@@ -73,41 +75,30 @@ class NeuralNet:
 
             self.delta_thresholds[-i] = nf.threshold_delta(learn_rate, gradient)
 
-        '''
-        gradient = nf.gradient_hidden(self.synapses[0], data, self.weights[1])
-        self.delta_weights[0] = nf.weight_delta(learn_rate, data, gradient)
-        self.delta_thresholds[0] = nf.threshold_delta(learn_rate, gradient)
-        '''
-
     def adjust_weights(self):
         for i in range(len(self.weights)):
             self.weights[i] = np.array(self.weights[i]) + np.array(self.delta_weights[i])
             self.thresholds[i] = np.array(self.thresholds[i]) + np.array(self.delta_thresholds[i])
 
-    def train(self, data, expected_output):
+    def train(self, data, expected_output, accepted_error, to_console=False):
 
         err = 1
         epoch = 0
-        while err > 0.000001:
-            print(table_row(['Epoch {}'.format(epoch), 'Input', 'Expected Value', 'Output', 'error'], 25))
-            print(('|' + '-' * 25) * 5 + '|')
+        while err > accepted_error:
+            if to_console:
+                print(table_row(['Epoch {}'.format(epoch), 'Input', 'Expected Value', 'Output', 'error'], 25))
+                print(('|' + '-' * 25) * 5 + '|')
             err = 0
             for d, e in zip(data, expected_output):
-                err += self.error
+                err = self.error
                 out = self.activation(d)
-                print(table_row(['', d, e, out, self.error], 25))
+                if to_console:
+                    print(table_row(['', d, e, out, self.error], 25))
+                #print('E:  ', e)
+                #print('O:  ', out)
                 self.weight_training(d, e, 0.1)
                 self.adjust_weights()
-            print(('|' + '-' * 25) * 5 + '|')
+            if to_console:
+                print(('|' + '-' * 25) * 5 + '|')
+            self.sum_squares.append(err)
             epoch += 1
-
-        print('Probability {} is odd: {}'.format([1, 1, 0], self.activation([1, 1, 0])))
-        print('Probability {} is odd: {}'.format([1, 1, 1], self.activation([1, 1, 1])))
-
-
-n = NeuralNet(3, 2, [2, 5])
-
-inp = [[0, 0, 0], [0, 0, 1], [0, 1, 0], [0, 1, 1], [1, 0, 0], [1, 0, 1]]
-exp = [[0, 1], [1, 0], [0, 1], [1, 0], [0, 1], [1, 0]]
-
-n.train(inp, exp)
