@@ -102,3 +102,4 @@ class NeuralNet:
                 print(('|' + '-' * 25) * 5 + '|')
             self.sum_squares.append(err)
             epoch += 1
+            print(err)
